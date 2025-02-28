@@ -2,6 +2,24 @@ use std::env;
 
 use regex::Regex;
 
+enum Predict {
+    OutTime,
+    Result,
+}
+
+impl Predict {
+    fn result(&self, times: &Times) {
+        match self {
+            Predict::OutTime => {
+                println!("calculando o horario de saida.")
+            }
+            Predict::Result => {
+                println!("calculando o saldo feito.")
+            }
+        }
+    }
+}
+
 struct Times {
     data: Vec<String>,
 }
@@ -45,6 +63,14 @@ impl Times {
         });
     }
 
+    fn predict(&self) -> Predict {
+        if self.data.len() % 2 == 0 {
+            Predict::Result
+        } else {
+            Predict::OutTime
+        }
+    }
+
     fn display(&self) {
         for (idx, arg) in self.data.iter().enumerate() {
             let kind = if idx % 2 == 0 { "Entrada:" } else { "Saida:  " };
@@ -67,13 +93,20 @@ impl Engine {
         }
     }
 
+    fn run(&mut self) {
+        self.display();
+
+        let predict = self.times.predict();
+        predict.result(&self.times);
+    }
+
     fn display(&self) {
         self.times.display();
     }
 }
 
 fn main() {
-    let args = Engine::new();
+    let mut engine = Engine::new();
 
-    args.display();
+    engine.run();
 }
