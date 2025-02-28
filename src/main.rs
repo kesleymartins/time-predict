@@ -2,17 +2,32 @@ use std::env;
 
 use regex::Regex;
 
-struct Times;
+struct Times {
+    data: Vec<String>,
+}
 
 impl Times {
-    fn filter(data: Vec<String>) -> Vec<String> {
-        let reg = Regex::new(r"^([01]?[0-9]|2[0-3]):([0-5]?[0-9])$").unwrap();
+    fn new(data: Vec<String>) -> Self {
+        let mut times = Times { data };
 
-        data.into_iter().filter(|time| reg.is_match(time)).collect()
+        times.filter_valid_times();
+        times.sort_times();
+
+        times
     }
 
-    fn fix_order(data: &mut Vec<String>) {
-        data.sort_by(|cur, next| {
+    fn filter_valid_times(&mut self) {
+        let reg = Regex::new(r"^([01]?[0-9]|2[0-3]):([0-5]?[0-9])$").unwrap();
+
+        self.data = self
+            .data
+            .drain(..)
+            .filter(|time| reg.is_match(time))
+            .collect();
+    }
+
+    fn sort_times(&mut self) {
+        self.data.sort_by(|cur, next| {
             let cur: Vec<&str> = cur.split(":").collect();
             let next: Vec<&str> = next.split(":").collect();
 
@@ -29,28 +44,31 @@ impl Times {
             }
         });
     }
+
+    fn display(&self) {
+        for (idx, arg) in self.data.iter().enumerate() {
+            let kind = if idx % 2 == 0 { "Entrada:" } else { "Saida:  " };
+
+            println!("{} {}", kind, arg);
+        }
+    }
 }
 
 struct Engine {
-    times: Vec<String>,
+    times: Times,
 }
 
 impl Engine {
     fn new() -> Self {
         let args: Vec<String> = env::args().collect();
 
-        let mut times = Times::filter(args);
-        Times::fix_order(&mut times);
-
-        Self { times }
+        Self {
+            times: Times::new(args),
+        }
     }
 
     fn display(&self) {
-        for (idx, arg) in self.times.iter().enumerate() {
-            let kind = if idx % 2 == 0 { "Entrada:" } else { "Saida:  " };
-
-            println!("{} {}", kind, arg);
-        }
+        self.times.display();
     }
 }
 
