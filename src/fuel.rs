@@ -32,18 +32,11 @@ impl Fuel {
     }
 
     fn parse_args(&mut self) {
-        self.times = self
-            .args
-            .iter()
-            .map(|arg| {
-                let time_data: Vec<&str> = arg.split(":").collect();
+        for (pos, arg) in self.args.iter().enumerate() {
+            let time = Time::from_arg(arg, pos);
 
-                let hours: i32 = time_data[0].parse().unwrap();
-                let minutes: i32 = time_data[1].parse().unwrap();
-
-                Time::from_minutes(hours * 60 + minutes)
-            })
-            .collect();
+            self.times.push(time);
+        }
     }
 
     fn sort_times(&mut self) {
@@ -62,10 +55,9 @@ impl Fuel {
             }
         });
 
-        // Desempacota de volta para os arrays
-        for (i, (v1, v2)) in paired.iter().enumerate() {
-            self.args[i] = v1.clone();
-            self.times[i] = *v2;
+        for (idx, (arg, time)) in paired.iter().enumerate() {
+            self.args[idx] = arg.clone();
+            self.times[idx] = time.clone();
         }
     }
 
@@ -78,7 +70,6 @@ impl Fuel {
     }
 
     pub fn sum(&self) -> Time {
-        let mut hours = 0;
         let mut minutes = 0;
 
         for chunk in self.times.chunks(2) {
@@ -89,20 +80,10 @@ impl Fuel {
             let cur = &chunk[0];
             let next = &chunk[1];
 
-            hours += next.hours - cur.hours;
-            minutes = next.minutes - cur.minutes;
+            minutes += cur.diff(next).in_minutes();
         }
 
-        while minutes > 60 {
-            hours += 1;
-            minutes -= 60;
-        }
-
-        Time {
-            sign: minutes.signum(),
-            hours,
-            minutes,
-        }
+        Time::from_minutes(minutes)
     }
 
     pub fn last_time(&self) -> &Time {

@@ -15,11 +15,8 @@ impl Prediction {
 
     fn predict_out_time(&self, fuel: &Fuel) -> Time {
         let last_time = fuel.last_time();
-        let work_time = Time {
-            sign: 1,
-            hours: 8,
-            minutes: 48,
-        };
+
+        let work_time = Time::from_minutes(8 * 60 + 48);
 
         let time_sum = fuel.sum();
         let time_diff = time_sum.diff(&work_time);
@@ -30,11 +27,7 @@ impl Prediction {
     }
 
     fn predict_result(&self, times: &Fuel) -> Time {
-        let work_time = Time {
-            sign: 1,
-            hours: 8,
-            minutes: 48,
-        };
+        let work_time = Time::from_minutes(8 * 60 + 48);
 
         let time_sum = times.sum();
         let time_diff = time_sum.diff(&work_time);
