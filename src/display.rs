@@ -14,7 +14,7 @@ impl Display {
     }
 
     pub fn stats(stats: &Stats) {
-        println!("==== Logs ====");
+        println!("==== Stats ====");
 
         if let Some(out_time) = &stats.out_time {
             println!("saida prevista: {}", out_time.format(false));
