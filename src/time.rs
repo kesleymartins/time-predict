@@ -1,3 +1,4 @@
+#[derive(Clone, Copy)]
 pub struct Time {
     pub sign: i32,
     pub hours: i32,
