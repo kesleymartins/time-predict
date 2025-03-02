@@ -1,4 +1,4 @@
-use std::env;
+use std::{env, ops::Sub};
 
 use regex::Regex;
 
@@ -14,7 +14,17 @@ impl Predict {
                 println!("calculando o horario de saida.")
             }
             Predict::Result => {
-                println!("calculando o saldo feito.")
+                println!("calculando o saldo feito.");
+
+                let work_time = Time {
+                    hours: 8,
+                    minutes: 48,
+                };
+
+                let time_sum = times.sum();
+                let time_diff = time_sum.diff(&work_time);
+
+                println!("Saldo realizado: {}", time_diff.format());
             }
         }
     }
@@ -23,6 +33,29 @@ impl Predict {
 struct Time {
     hours: i32,
     minutes: i32,
+}
+
+impl Time {
+    fn diff(&self, time: &Time) -> Time {
+        let minutes = self.in_minutes() - time.in_minutes();
+
+        return Time::from_minutes(minutes);
+    }
+
+    fn from_minutes(min: i32) -> Self {
+        let hours = min / 60;
+        let minutes = min % 60;
+
+        Self { hours, minutes }
+    }
+
+    fn in_minutes(&self) -> i32 {
+        self.hours * 60 + self.minutes
+    }
+
+    fn format(&self) -> String {
+        format!("{}:{}", self.hours, self.minutes)
+    }
 }
 
 struct Times {
@@ -88,12 +121,42 @@ impl Times {
         }
     }
 
+    fn sum(&self) -> Time {
+        let mut hours = 0;
+        let mut minutes = 0;
+
+        for chunk in self.data.chunks(2) {
+            if chunk.len() == 1 {
+                continue;
+            }
+
+            let cur = &chunk[0].1.as_ref().unwrap();
+            let next = &chunk[1].1.as_ref().unwrap();
+
+            hours += next.hours - cur.hours;
+            minutes = next.minutes - cur.minutes;
+        }
+
+        while minutes > 60 {
+            hours += 1;
+            minutes -= 60;
+        }
+
+        Time { hours, minutes }
+    }
+
+    fn last_time(&self) -> &Time {
+        self.data.last().unwrap().1.as_ref().unwrap()
+    }
+
     fn display(&self) {
         for (idx, arg) in self.data.iter().enumerate() {
             let kind = if idx % 2 == 0 { "Entrada:" } else { "Saida:  " };
 
             println!("{} {}", kind, arg.0);
         }
+
+        println!("Soma: {}", self.sum().format());
     }
 }
 
