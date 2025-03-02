@@ -20,15 +20,23 @@ impl Predict {
     }
 }
 
+struct Time {
+    hours: i32,
+    minutes: i32,
+}
+
 struct Times {
-    data: Vec<String>,
+    data: Vec<(String, Option<Time>)>,
 }
 
 impl Times {
     fn new(data: Vec<String>) -> Self {
+        let data = data.iter().map(|arg| (arg.clone(), None)).collect();
+
         let mut times = Times { data };
 
         times.filter_valid_times();
+        times.parse_data();
         times.sort_times();
 
         times
@@ -40,25 +48,34 @@ impl Times {
         self.data = self
             .data
             .drain(..)
-            .filter(|time| reg.is_match(time))
+            .filter(|time| reg.is_match(&time.0))
+            .collect();
+    }
+
+    fn parse_data(&mut self) {
+        self.data = self
+            .data
+            .iter()
+            .map(|time| {
+                let time_data: Vec<&str> = time.0.split(":").collect();
+
+                let hours: i32 = time_data[0].parse().unwrap();
+                let minutes: i32 = time_data[1].parse().unwrap();
+
+                (time.0.clone(), Some(Time { hours, minutes }))
+            })
             .collect();
     }
 
     fn sort_times(&mut self) {
         self.data.sort_by(|cur, next| {
-            let cur: Vec<&str> = cur.split(":").collect();
-            let next: Vec<&str> = next.split(":").collect();
+            let cur = cur.1.as_ref().unwrap();
+            let next = next.1.as_ref().unwrap();
 
-            let cur_hours: i32 = cur[0].parse().unwrap();
-            let cur_minutes: i32 = cur[1].parse().unwrap();
-
-            let next_hours: i32 = next[0].parse().unwrap();
-            let next_minutes: i32 = next[1].parse().unwrap();
-
-            if cur_hours == next_hours {
-                cur_minutes.cmp(&next_minutes)
+            if cur.hours == next.hours {
+                cur.minutes.cmp(&next.minutes)
             } else {
-                cur_hours.cmp(&next_hours)
+                cur.hours.cmp(&next.hours)
             }
         });
     }
@@ -75,12 +92,14 @@ impl Times {
         for (idx, arg) in self.data.iter().enumerate() {
             let kind = if idx % 2 == 0 { "Entrada:" } else { "Saida:  " };
 
-            println!("{} {}", kind, arg);
+            println!("{} {}", kind, arg.0);
         }
     }
 }
 
 struct Engine {
+    // Display
+    // Tags
     times: Times,
 }
 
