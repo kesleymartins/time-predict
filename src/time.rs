@@ -69,7 +69,7 @@ impl Time {
         let mut data: Vec<String> = Vec::new();
 
         if let Some(kind) = &self.kind {
-            data.push(kind.clone());
+            data.push(format!("{} ", kind.clone()));
         }
 
         if with_sign {
@@ -86,7 +86,6 @@ impl Time {
 
         let result = data.iter().fold(String::new(), |mut acc, value| {
             acc.push_str(value);
-            acc.push_str(" ");
 
             acc
         });

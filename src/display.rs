@@ -1,4 +1,4 @@
-use crate::{fuel::Fuel, time::Time};
+use crate::{fuel::Fuel, stats::Stats};
 
 pub struct Display;
 
@@ -13,9 +13,21 @@ impl Display {
         println!();
     }
 
-    pub fn stats(time: &Time) {
-        println!(" ==== Logs ====");
+    pub fn stats(stats: &Stats) {
+        println!("==== Logs ====");
 
-        // TODO
+        if let Some(out_time) = &stats.out_time {
+            println!("saida prevista: {}", out_time.format(false));
+        } else {
+            println!("saida prevista: -");
+        }
+
+        if let Some(real_out_time) = &stats.real_out_time {
+            println!("saida real: {}", real_out_time.format(false));
+        } else {
+            println!("saida real: -");
+        }
+
+        println!("saldo: {}", stats.balance.format(true));
     }
 }

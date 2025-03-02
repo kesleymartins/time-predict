@@ -1,4 +1,4 @@
-use crate::{fuel::Fuel, time::Time};
+use crate::{fuel::Fuel, stats::Stats, time::Time};
 
 pub enum Prediction {
     OutTime,
@@ -6,32 +6,34 @@ pub enum Prediction {
 }
 
 impl Prediction {
-    pub fn predict(&self, fuel: &Fuel) -> Time {
+    pub fn predict(&self, fuel: &Fuel) -> Stats {
         match self {
             Prediction::OutTime => self.predict_out_time(&fuel),
             Prediction::Result => self.predict_result(&fuel),
         }
     }
 
-    fn predict_out_time(&self, fuel: &Fuel) -> Time {
-        let last_time = fuel.last_time();
-
+    fn predict_out_time(&self, fuel: &Fuel) -> Stats {
         let work_time = Time::from_minutes(8 * 60 + 48);
+        let worked_time = fuel.sum();
 
-        let time_sum = fuel.sum();
-        let time_diff = time_sum.diff(&work_time);
+        let last_check_in = fuel.last_check_in().unwrap();
 
-        let next_time = Time::from_diff(&last_time, &time_diff);
+        let balance = worked_time.diff(&work_time);
+        let out_time = Some(Time::from_diff(&last_check_in, &balance));
+        let real_out_time = None;
 
-        next_time
+        Stats::new(balance, out_time, real_out_time)
     }
 
-    fn predict_result(&self, times: &Fuel) -> Time {
+    fn predict_result(&self, fuel: &Fuel) -> Stats {
         let work_time = Time::from_minutes(8 * 60 + 48);
+        let worked_time = fuel.sum();
 
-        let time_sum = times.sum();
-        let time_diff = time_sum.diff(&work_time);
+        let balance = worked_time.diff(&work_time);
+        let out_time = None;
+        let real_out_time = fuel.last_check_out();
 
-        time_diff
+        Stats::new(balance, out_time, real_out_time)
     }
 }

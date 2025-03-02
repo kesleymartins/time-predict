@@ -4,6 +4,7 @@ mod display;
 mod engine;
 mod fuel;
 mod prediction;
+mod stats;
 mod time;
 
 fn main() {

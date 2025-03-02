@@ -86,8 +86,35 @@ impl Fuel {
         Time::from_minutes(minutes)
     }
 
-    pub fn last_time(&self) -> &Time {
-        self.times.last().as_ref().unwrap()
+    pub fn last_check_out(&self) -> Option<Time> {
+        let times_len = self.times.len();
+
+        if times_len % 2 == 0 {
+            if let Some(time) = self.times.get(times_len - 1) {
+                return Some(time.clone());
+            }
+        }
+
+        if let Some(time) = self.times.get(times_len - 2) {
+            return Some(time.clone());
+        }
+
+        None
+    }
+    pub fn last_check_in(&self) -> Option<Time> {
+        let times_len = self.times.len();
+
+        if times_len % 2 != 0 {
+            if let Some(time) = self.times.get(times_len - 1) {
+                return Some(time.clone());
+            }
+        }
+
+        if let Some(time) = self.times.get(times_len - 2) {
+            return Some(time.clone());
+        }
+
+        None
     }
 
     pub fn iter_times(&self) -> std::slice::Iter<Time> {
