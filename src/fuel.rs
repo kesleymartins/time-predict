@@ -90,34 +90,33 @@ impl Fuel {
         let times_len = self.times.len();
 
         if times_len % 2 == 0 {
-            if let Some(time) = self.times.get(times_len - 1) {
-                return Some(time.clone());
-            }
+            return self.get_from_end(1);
         }
 
-        if let Some(time) = self.times.get(times_len - 2) {
-            return Some(time.clone());
-        }
-
-        None
+        self.get_from_end(2)
     }
+
     pub fn last_check_in(&self) -> Option<Time> {
         let times_len = self.times.len();
 
         if times_len % 2 != 0 {
-            if let Some(time) = self.times.get(times_len - 1) {
-                return Some(time.clone());
-            }
+            return self.get_from_end(1);
         }
 
-        if let Some(time) = self.times.get(times_len - 2) {
-            return Some(time.clone());
-        }
-
-        None
+        self.get_from_end(2)
     }
 
     pub fn iter_times(&self) -> std::slice::Iter<Time> {
         self.times.iter()
+    }
+
+    fn get_from_end(&self, idx: usize) -> Option<Time> {
+        let times_len = self.times.len();
+
+        if let Some(time) = self.times.get(times_len - idx) {
+            return Some(time.clone());
+        }
+
+        None
     }
 }
