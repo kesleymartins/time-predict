@@ -1,9 +1,8 @@
 use std::env;
 
-use crate::fuel::Fuel;
+use crate::{display::Display, fuel::Fuel};
 
 pub struct Engine {
-    // Display
     // Tags
     fuel: Fuel,
 }
@@ -18,13 +17,10 @@ impl Engine {
     }
 
     pub fn run(&mut self) {
-        self.display();
-
         let prediction = self.fuel.predictiction();
-        let _result = prediction.predict(&self.fuel);
-    }
+        let result = prediction.predict(&self.fuel);
 
-    fn display(&self) {
-        self.fuel.display();
+        Display::logs(&self.fuel);
+        Display::stats(&result);
     }
 }

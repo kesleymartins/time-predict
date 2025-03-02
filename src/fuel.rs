@@ -100,14 +100,4 @@ impl Fuel {
     pub fn last_time(&self) -> &Time {
         self.times.last().unwrap().1.as_ref().unwrap()
     }
-
-    pub fn display(&self) {
-        for (idx, arg) in self.times.iter().enumerate() {
-            let kind = if idx % 2 == 0 { "Entrada:" } else { "Saida:  " };
-
-            println!("{} {}", kind, arg.1.as_ref().unwrap().format(false));
-        }
-
-        println!("Tempo realizado: {}", self.sum().format(false));
-    }
 }

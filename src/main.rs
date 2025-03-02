@@ -1,5 +1,6 @@
 use engine::Engine;
 
+mod display;
 mod engine;
 mod fuel;
 mod prediction;
