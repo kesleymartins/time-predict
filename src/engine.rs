@@ -20,8 +20,8 @@ impl Engine {
     pub fn run(&mut self) {
         self.display();
 
-        let predict = self.fuel.predict();
-        predict.result(&self.fuel);
+        let prediction = self.fuel.predictiction();
+        let _result = prediction.predict(&self.fuel);
     }
 
     fn display(&self) {

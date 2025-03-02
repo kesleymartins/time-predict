@@ -1,6 +1,6 @@
 use regex::Regex;
 
-use crate::{predict::Predict, time::Time};
+use crate::{prediction::Prediction, time::Time};
 
 pub struct Fuel {
     pub times: Vec<(String, Option<Time>)>,
@@ -59,11 +59,11 @@ impl Fuel {
         });
     }
 
-    pub fn predict(&self) -> Predict {
+    pub fn predictiction(&self) -> Prediction {
         if self.times.len() % 2 == 0 {
-            Predict::Result
+            Prediction::Result
         } else {
-            Predict::OutTime
+            Prediction::OutTime
         }
     }
 

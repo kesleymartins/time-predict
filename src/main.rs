@@ -2,7 +2,7 @@ use engine::Engine;
 
 mod engine;
 mod fuel;
-mod predict;
+mod prediction;
 mod time;
 
 fn main() {
