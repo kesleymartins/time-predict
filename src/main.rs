@@ -11,12 +11,9 @@ impl Predict {
     fn result(&self, times: &Times) {
         match self {
             Predict::OutTime => {
-                println!("calculando o horario de saida.")
-            }
-            Predict::Result => {
-                println!("calculando o saldo feito.");
-
+                let last_time = times.last_time();
                 let work_time = Time {
+                    sign: 1,
                     hours: 8,
                     minutes: 48,
                 };
@@ -24,13 +21,29 @@ impl Predict {
                 let time_sum = times.sum();
                 let time_diff = time_sum.diff(&work_time);
 
-                println!("Saldo realizado: {}", time_diff.format());
+                let next_time = Time::from_diff(&last_time, &time_diff);
+
+                println!("Horário previsto: {}", next_time.format(false));
+            }
+
+            Predict::Result => {
+                let work_time = Time {
+                    sign: 1,
+                    hours: 8,
+                    minutes: 48,
+                };
+
+                let time_sum = times.sum();
+                let time_diff = time_sum.diff(&work_time);
+
+                println!("Saldo realizado: {}", time_diff.format(true));
             }
         }
     }
 }
 
 struct Time {
+    sign: i32,
     hours: i32,
     minutes: i32,
 }
@@ -46,15 +59,48 @@ impl Time {
         let hours = min / 60;
         let minutes = min % 60;
 
-        Self { hours, minutes }
+        let sign = minutes.signum();
+
+        Self {
+            sign,
+            hours: hours.abs(),
+            minutes: minutes.abs(),
+        }
+    }
+
+    fn from_diff(time: &Time, diff: &Time) -> Self {
+        let mut hours = time.hours + diff.hours;
+        let mut minutes = time.minutes + diff.minutes;
+
+        if minutes >= 60 {
+            hours += 1;
+            minutes -= 60;
+        }
+
+        let sign = minutes.signum();
+
+        Self {
+            sign,
+            hours,
+            minutes,
+        }
     }
 
     fn in_minutes(&self) -> i32 {
         self.hours * 60 + self.minutes
     }
 
-    fn format(&self) -> String {
-        format!("{}:{}", self.hours, self.minutes)
+    fn format(&self, with_wign: bool) -> String {
+        if with_wign {
+            let sign = match self.sign.is_positive() {
+                true => "+",
+                false => "-",
+            };
+
+            return format!("{}{:0>2}:{:0>2}", sign, self.hours, self.minutes);
+        }
+
+        format!("{:0>2}:{:0>2}", self.hours, self.minutes)
     }
 }
 
@@ -95,7 +141,9 @@ impl Times {
                 let hours: i32 = time_data[0].parse().unwrap();
                 let minutes: i32 = time_data[1].parse().unwrap();
 
-                (time.0.clone(), Some(Time { hours, minutes }))
+                let new_time = Time::from_minutes(hours * 60 + minutes);
+
+                (time.0.clone(), Some(new_time))
             })
             .collect();
     }
@@ -142,7 +190,13 @@ impl Times {
             minutes -= 60;
         }
 
-        Time { hours, minutes }
+        let sign = minutes.signum();
+
+        Time {
+            sign,
+            hours,
+            minutes,
+        }
     }
 
     fn last_time(&self) -> &Time {
@@ -153,10 +207,10 @@ impl Times {
         for (idx, arg) in self.data.iter().enumerate() {
             let kind = if idx % 2 == 0 { "Entrada:" } else { "Saida:  " };
 
-            println!("{} {}", kind, arg.0);
+            println!("{} {}", kind, arg.1.as_ref().unwrap().format(false));
         }
 
-        println!("Soma: {}", self.sum().format());
+        println!("Tempo realizado: {}", self.sum().format(false));
     }
 }
 
