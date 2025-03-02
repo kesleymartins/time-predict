@@ -1,4 +1,4 @@
-use crate::{Times, time::Time};
+use crate::{fuel::Fuel, time::Time};
 
 pub enum Predict {
     OutTime,
@@ -6,7 +6,7 @@ pub enum Predict {
 }
 
 impl Predict {
-    pub fn result(&self, times: &Times) {
+    pub fn result(&self, times: &Fuel) {
         match self {
             Predict::OutTime => {
                 let last_time = times.last_time();

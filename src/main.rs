@@ -1,10 +1,9 @@
 use engine::Engine;
-use times::Times;
 
 mod engine;
+mod fuel;
 mod predict;
 mod time;
-mod times;
 
 fn main() {
     let mut engine = Engine::new();

@@ -2,15 +2,15 @@ use regex::Regex;
 
 use crate::{predict::Predict, time::Time};
 
-pub struct Times {
-    pub data: Vec<(String, Option<Time>)>,
+pub struct Fuel {
+    pub times: Vec<(String, Option<Time>)>,
 }
 
-impl Times {
+impl Fuel {
     pub fn new(data: Vec<String>) -> Self {
         let data = data.iter().map(|arg| (arg.clone(), None)).collect();
 
-        let mut times = Times { data };
+        let mut times = Fuel { times: data };
 
         times.filter_valid_times();
         times.parse_data();
@@ -22,16 +22,16 @@ impl Times {
     fn filter_valid_times(&mut self) {
         let reg = Regex::new(r"^([01]?[0-9]|2[0-3]):([0-5]?[0-9])$").unwrap();
 
-        self.data = self
-            .data
+        self.times = self
+            .times
             .drain(..)
             .filter(|time| reg.is_match(&time.0))
             .collect();
     }
 
     fn parse_data(&mut self) {
-        self.data = self
-            .data
+        self.times = self
+            .times
             .iter()
             .map(|time| {
                 let time_data: Vec<&str> = time.0.split(":").collect();
@@ -47,7 +47,7 @@ impl Times {
     }
 
     fn sort_times(&mut self) {
-        self.data.sort_by(|cur, next| {
+        self.times.sort_by(|cur, next| {
             let cur = cur.1.as_ref().unwrap();
             let next = next.1.as_ref().unwrap();
 
@@ -60,7 +60,7 @@ impl Times {
     }
 
     pub fn predict(&self) -> Predict {
-        if self.data.len() % 2 == 0 {
+        if self.times.len() % 2 == 0 {
             Predict::Result
         } else {
             Predict::OutTime
@@ -71,7 +71,7 @@ impl Times {
         let mut hours = 0;
         let mut minutes = 0;
 
-        for chunk in self.data.chunks(2) {
+        for chunk in self.times.chunks(2) {
             if chunk.len() == 1 {
                 continue;
             }
@@ -98,11 +98,11 @@ impl Times {
     }
 
     pub fn last_time(&self) -> &Time {
-        self.data.last().unwrap().1.as_ref().unwrap()
+        self.times.last().unwrap().1.as_ref().unwrap()
     }
 
     pub fn display(&self) {
-        for (idx, arg) in self.data.iter().enumerate() {
+        for (idx, arg) in self.times.iter().enumerate() {
             let kind = if idx % 2 == 0 { "Entrada:" } else { "Saida:  " };
 
             println!("{} {}", kind, arg.1.as_ref().unwrap().format(false));

@@ -1,11 +1,11 @@
 use std::env;
 
-use crate::times::Times;
+use crate::fuel::Fuel;
 
 pub struct Engine {
     // Display
     // Tags
-    times: Times,
+    fuel: Fuel,
 }
 
 impl Engine {
@@ -13,18 +13,18 @@ impl Engine {
         let args: Vec<String> = env::args().collect();
 
         Self {
-            times: Times::new(args),
+            fuel: Fuel::new(args),
         }
     }
 
     pub fn run(&mut self) {
         self.display();
 
-        let predict = self.times.predict();
-        predict.result(&self.times);
+        let predict = self.fuel.predict();
+        predict.result(&self.fuel);
     }
 
     fn display(&self) {
-        self.times.display();
+        self.fuel.display();
     }
 }
